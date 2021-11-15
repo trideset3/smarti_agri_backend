@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'smart_agri',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'localhost',
+        'HOST': 'postgres://dzepolyuwzklxz:059557e41c84a9748dda98e5ffd7bf7ff426700fbaaba9c75a842db8ce5053e5@ec2-52-72-155-37.compute-1.amazonaws.com:5432/d9sjg333qgk2rj',
         'PORT': '5432'
     }
 }
@@ -133,3 +133,8 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import django_heroku
 django_heroku.settings(locals())
+
+import dj_database_url
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
