@@ -86,7 +86,7 @@ DATABASES = {
         'NAME': 'smart_agri',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'localhost',
+        'HOST': 'postgres://dzepolyuwzklxz:059557e41c84a9748dda98e5ffd7bf7ff426700fbaaba9c75a842db8ce5053e5@ec2-52-72-155-37.compute-1.amazonaws.com:5432/d9sjg333qgk2rj',
         'PORT': '5432'
     }
 }
