@@ -10,9 +10,32 @@ import json
 
 
 def getFields(request):
-    data=Fields.objects.all().order_by('-season')
-    data_json = serialize('geojson', data, geometry_field='geom')
-    return HttpResponse(data_json)
+    with connection.cursor() as cursor:
+        cursor.execute("""SELECT
+    field_id,
+    field_code,
+    field_name,
+    mun_name,
+    soil_type,
+    area_ha,
+    state,
+    yield_amount,
+    season_id,
+    season_name,
+    culture_id,
+    culture_name,
+    sort_name,
+    eco_production,
+    geom
+FROM
+    _V_fields_details
+ORDER BY
+    season_id DESC,
+    field_name DESC
+""")
+        data = dictfetchall(cursor)
+
+    return HttpResponse(json.dumps(data))
 
 def getSeasons(request):
     data=Seasons.objects.all().order_by('-season_start')
