@@ -11,27 +11,70 @@ import json
 
 def getFields(request):
     with connection.cursor() as cursor:
-        cursor.execute("""SELECT
-    field_id,
-    field_code,
-    field_name,
-    mun_name,
-    soil_type,
-    area_ha,
-    state,
-    yield_amount,
-    season_id,
-    season_name,
-    culture_id,
-    culture_name,
-    sort_name,
-    eco_production,
-    geom
-FROM
-    _V_fields_details
-ORDER BY
-    season_id DESC,
-    field_name DESC
+        cursor.execute("""WITH getFieldsCTE (field_id, field_code, field_name, mun_name, soil_type, area_ha, state, yield_amount, season_id, 
+    season_name, season_start, culture_id, culture_name, sort_name, eco_production, geom) 
+AS (
+    SELECT 
+        field_id, 
+        field_code, 
+        field_name, 
+        mun_name, 
+        soil_type, 
+        area_ha, 
+        state, 
+        yield_amount, 
+        season_id, 
+        season_name, 
+        season_start, 
+        culture_id, 
+        culture_name, 
+        sort_name, 
+        eco_production, 
+        geom
+    FROM 
+        public._v_fields_details
+    ORDER BY
+        season_id DESC,
+        field_name DESC
+)
+
+SELECT json_build_object(
+    'type', 'FeatureCollection',
+    'crs',  json_build_object(
+        'type',      'name', 
+        'properties', json_build_object(
+            'name', 'EPSG:4326'  
+        )
+    ), 
+    'features', json_agg(
+        json_build_object(
+            'type',       'Feature',
+            'id',        field_id, -- the GeoJson spec includes an 'id' field, but it is optional, replace {id} with your id field
+            'geometry',   ST_AsGeoJSON(geom)::json,
+            'properties', json_build_object(
+                -- list of fields
+                'field_id', field_id,
+                'field_code', field_code,
+                'field_name', field_name,
+                'mun_name', mun_name,
+                'soil_type', soil_type,
+                'area_ha', area_ha, 
+                'state', state,
+                'yield_amount', yield_amount,
+                'season_id', season_id,
+                'season_name', season_name,
+                'season_start', season_start,
+                'culture_id', culture_id,
+                'culture_name', culture_name,
+                'sort_name', sort_name,
+                'eco_production', eco_production
+            )
+        )
+    )
+)
+FROM 
+    getFieldsCTE
+
 """)
         data = dictfetchall(cursor)
 
